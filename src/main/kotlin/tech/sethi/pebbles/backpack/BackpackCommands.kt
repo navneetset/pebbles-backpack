@@ -139,8 +139,7 @@ object BackpackCommands {
 
                     playerEntity.giveItemStack(skullStack)
 
-                    val backpackInventory = BackpackInventory(size)
-                    backpacks[id] = backpackInventory
+
                     ctx.source.sendFeedback(
                         Text.literal("Backpack retrieved with: $id"), false
                     )

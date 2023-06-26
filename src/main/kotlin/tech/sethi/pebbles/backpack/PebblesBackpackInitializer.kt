@@ -6,8 +6,8 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
 import net.minecraft.util.*
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -43,7 +43,7 @@ class PebblesBackpackInitializer : ModInitializer {
 
             val itemStack = player.getStackInHand(hand)
 
-            val skullItem = Registry.ITEM.get(Identifier("minecraft:player_head"))
+            val skullItem = Registries.ITEM.get(Identifier("minecraft:player_head"))
 
             if (itemStack.item != skullItem) {
                 return@UseBlockCallback ActionResult.PASS
@@ -66,7 +66,7 @@ class PebblesBackpackInitializer : ModInitializer {
 
         // check if player right clicks with a backpack
         val backpackInteraction = let@{ player: PlayerEntity, _: World, _: Hand, stack: ItemStack ->
-            val skullItem = Registry.ITEM.get(Identifier("minecraft:player_head"))
+            val skullItem = Registries.ITEM.get(Identifier("minecraft:player_head"))
 
             if (stack.item != skullItem) {
                 return@let TypedActionResult.pass(stack)

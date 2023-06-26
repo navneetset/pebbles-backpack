@@ -64,7 +64,7 @@ class BackpackScreenHandler(
         }
     }
 
-    override fun transferSlot(player: PlayerEntity?, index: Int): ItemStack {
+    override fun quickMove(player: PlayerEntity?, index: Int): ItemStack {
         var itemStack = ItemStack.EMPTY
         val slot = this.slots[index]
         if (slot.hasStack()) {
@@ -124,13 +124,13 @@ class BackpackScreenHandler(
             }
         }
     }
-
-    override fun close(player: PlayerEntity) {
+    override fun onClosed(player: PlayerEntity?) {
         saveScheduled.set(false)
-        super.close(player)
-        saveBackpackData(player)
+        if (player != null) {
+            saveBackpackData(player)
+        }
+        super.onClosed(player)
     }
-
 
     override fun onSlotClick(slotIndex: Int, button: Int, actionType: SlotActionType?, player: PlayerEntity?) {
         if (slotIndex < 0) {

@@ -76,7 +76,7 @@ object BackpackCommands {
                 backpacks[nextId] = backpackInventory
 
                 ctx.source.sendFeedback(
-                    Text.literal("Backpack created with ID: $nextId for $playerName"), false
+                    { Text.literal("Backpack created with ID: $nextId for $playerName") }, false
                 )
 
                 val backpacksFile = getBackpacksFile(ctx.source.server)
@@ -141,7 +141,7 @@ object BackpackCommands {
 
 
                     ctx.source.sendFeedback(
-                        Text.literal("Backpack retrieved with: $id"), false
+                        { Text.literal("Backpack retrieved with: $id") }, false
                     )
 
                     return@executes 1

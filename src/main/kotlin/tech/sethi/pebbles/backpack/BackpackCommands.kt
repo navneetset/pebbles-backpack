@@ -1,6 +1,7 @@
 package tech.sethi.pebbles.backpack
 
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -207,7 +208,10 @@ object BackpackCommands {
 
         file.reader().use { reader ->
             val jsonElement = JsonParser.parseReader(reader)
-            val backpackDataArray = jsonElement.asJsonArray
+            var backpackDataArray = JsonArray()
+            if (!jsonElement.isJsonNull) {
+                backpackDataArray = jsonElement.asJsonArray
+            }
 
             for (backpackDataJson in backpackDataArray) {
                 val backpackData = gson.fromJson(backpackDataJson, BackpackData::class.java)

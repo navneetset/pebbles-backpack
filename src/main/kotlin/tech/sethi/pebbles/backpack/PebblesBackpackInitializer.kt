@@ -5,8 +5,13 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.block.Blocks
+import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Items
+import net.minecraft.nbt.NbtElement
+import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.Registries
+import net.minecraft.registry.RegistryOps
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.*
 import net.minecraft.util.hit.BlockHitResult
@@ -17,12 +22,12 @@ import tech.sethi.pebbles.backpack.migration.LegacyMigration
 import tech.sethi.pebbles.backpack.storage.BackpackCache
 import java.io.File
 
-class PebblesBackpackInitializer : ModInitializer {
+object PebblesBackpackInitializer : ModInitializer {
 
-    companion object {
-        val MODID = "pebbles-backpack"
-        val LOGGER = LoggerFactory.getLogger(MODID)
-    }
+    val MODID = "pebbles-backpack"
+    val LOGGER = LoggerFactory.getLogger(MODID)
+    var server: MinecraftServer? = null
+    var nbtOps: RegistryOps<NbtElement>? = null
 
     override fun onInitialize() {
         LOGGER.info("Registering Pebble's Backpack Commands!")
@@ -32,6 +37,8 @@ class PebblesBackpackInitializer : ModInitializer {
         }
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting { server ->
+            this.server = server
+            nbtOps = server!!.registryManager.getOps(NbtOps.INSTANCE)
             BackpackCache.initialize(getOrCreateRootBackpackFolder(server))
             LegacyMigration.migrateLegacyBackpacks(server)
         })
@@ -90,17 +97,13 @@ class PebblesBackpackInitializer : ModInitializer {
         if (world.isClient) return false
 
         val stack = player.getStackInHand(hand)
-        val skullItem = Registries.ITEM.get(Identifier("minecraft:player_head"))
-        if (stack.item != skullItem) return false
+        if (stack.item != Items.PLAYER_HEAD) return false
 
         LegacyMigration.migrateItemStack(stack)
-        if (!stack.orCreateNbt.containsUuid("BackpackUUID")) return false
-        val backpackUUID = stack.orCreateNbt.getUuid("BackpackUUID")
+        val backpackUUID = stack.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.getUuid("BackpackUUID") ?: return false
 
         val backpack = BackpackCache[backpackUUID]
-        if (backpack != null) {
-            InventoryHandler.openBackpack(player, backpack)
-        }
+        if (backpack != null) InventoryHandler.openBackpack(player, backpack)
 
         return true
     }

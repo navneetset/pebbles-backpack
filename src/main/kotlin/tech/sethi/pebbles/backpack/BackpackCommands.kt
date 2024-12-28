@@ -7,6 +7,7 @@ import net.luckperms.api.LuckPermsProvider
 import net.minecraft.command.CommandSource
 import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.command.argument.UuidArgumentType
+import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.server.command.CommandManager
@@ -125,8 +126,8 @@ object BackpackCommands {
 
                         if (LegacyMigration.isBackpack(itemInHand)) {
                             LegacyMigration.migrateItemStack(itemInHand)
-                            if (itemInHand.orCreateNbt.containsUuid("BackpackUUID")) {
-                                val backpackUUID = itemInHand.orCreateNbt.getUuid("BackpackUUID")
+                            if (itemInHand.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.containsUuid("BackpackUUID") == true) {
+                                val backpackUUID = itemInHand.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.getUuid("BackpackUUID")
                                 ctx.source.sendFeedback({ Text.literal(backpackUUID.toString()) }, false)
                                 return@executes 1
                             }

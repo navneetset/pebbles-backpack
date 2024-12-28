@@ -3,6 +3,7 @@ package tech.sethi.pebbles.backpack.migration
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
+import net.minecraft.component.DataComponentTypes
 import net.minecraft.item.ItemStack
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.WorldSavePath
@@ -23,14 +24,14 @@ object LegacyMigration {
     fun isBackpack(maybeBackpack: ItemStack): Boolean {
         if (isLegacyBackpack(maybeBackpack)) return true
 
-        if (maybeBackpack.nbt == null) return false
-        return maybeBackpack.nbt!!.get("BackpackUUID") != null
+        if (maybeBackpack.componentChanges.size() < 1) return false
+        return maybeBackpack.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.containsUuid("BackpackUUID") ?: false
     }
 
     fun migrateItemStack(backpack: ItemStack) {
         if (!isLegacyBackpack(backpack)) return
 
-        val nbt = backpack.orCreateNbt
+        val nbt = backpack.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt() ?: return
         val legacyId = nbt.getInt("BackpackID")
         val newId = UUID(0L, legacyId.toLong())
         nbt.remove("BackpackID")
@@ -38,8 +39,8 @@ object LegacyMigration {
     }
 
     private fun isLegacyBackpack(backpack: ItemStack): Boolean {
-        if (backpack.nbt == null) return false
-        return backpack.nbt!!.get("BackpackID") != null
+        if (backpack.componentChanges.size() < 1) return false
+        return backpack.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.contains("BackpackID") ?: false
     }
 
     fun migrateLegacyBackpacks(server: MinecraftServer) {

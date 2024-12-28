@@ -20,7 +20,7 @@ class BackpackTypeAdapter : JsonSerializer<Backpack>, JsonDeserializer<Backpack>
         json.addProperty("tier", backpack.tier.name)
 
         val items = JsonArray()
-        backpack.inventory.stacks.forEach { item ->
+        backpack.inventory.heldStacks.forEach { item ->
             items.add(itemStackAdapter.serialize(item, ItemStack::class.java, null))
         }
         json.add("items", items)
